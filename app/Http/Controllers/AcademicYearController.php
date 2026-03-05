@@ -10,7 +10,8 @@ class AcademicYearController extends Controller
 {
     public function index()
     {
-        return AcademicYear::all();
+        $academicYears = AcademicYear::orderBy('start_date', 'desc')->paginate(10);
+        return view('academic-years.index', compact('academicYears'));
     }
 
     public function create()
@@ -20,9 +21,17 @@ class AcademicYearController extends Controller
 
     public function store(Request $request)
     {
-        AcademicYear::create($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'status' => 'required|in:draft,active,closed'
+        ]);
 
-        return back();
+        AcademicYear::create($validated);
+
+        return redirect()->route('academic-years.index')
+            ->with('success', 'Année académique créée avec succès.');
     }
 
     /**
@@ -30,7 +39,7 @@ class AcademicYearController extends Controller
      */
     public function show(AcademicYear $academicYear)
     {
-        return $academicYear;
+        return view('academic-years.show', compact('academicYear'));
     }
 
     public function edit(AcademicYear $academicYear)
@@ -40,16 +49,25 @@ class AcademicYearController extends Controller
 
     public function update(Request $request, AcademicYear $academicYear)
     {
-        $academicYear->update($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'status' => 'required|in:draft,active,closed'
+        ]);
 
-        return back();
+        $academicYear->update($validated);
+
+        return redirect()->route('academic-years.index')
+            ->with('success', 'Année académique mise à jour avec succès.');
     }
 
     public function destroy(AcademicYear $academicYear)
     {
         $academicYear->delete();
 
-        return back();
+        return redirect()->route('academic-years.index')
+            ->with('success', 'Année académique supprimée avec succès.');
     }
 
     public function activate(

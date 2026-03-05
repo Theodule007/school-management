@@ -11,14 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subject_section', function (Blueprint $table) {
+        Schema::create('subject_sections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('section_id')->constrained()->cascadeOnDelete();
-            $table->integer('coefficient');
+            $table->foreignId('level_section_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->foreignId('subject_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->float('coefficient');
             $table->timestamps();
 
-            $table->unique(['subject_id', 'section_id']);
+            $table->unique(['level_section_id', 'subject_id']);
         });
     }
 

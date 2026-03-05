@@ -14,8 +14,12 @@ class SubjectSeeder extends Seeder
     public function run(): void
     {
 
-        foreach (['Math', 'Français', 'Physique'] as $subject) {
-            Subject::create(['name' => $subject]);
-        }
+        Subject::insert([
+            ['name' => 'Mathematiques'],
+            ['name' => 'Physique'],
+            ['name' => 'SVT'],
+            ['name' => 'Philosophie'],
+            ['name' => 'Francais'],
+        ]);
     }
 }

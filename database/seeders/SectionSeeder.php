@@ -14,9 +14,13 @@ class SectionSeeder extends Seeder
      */
     public function run(): void
     {
-        foreach (Level::all() as $level) {
-            Section::create(['name' => 'A', 'level_id' => $level->id]);
-            Section::create(['name' => 'B', 'level_id' => $level->id]);
-        }
+       
+            Section::insert([
+                ['name' => 'SVT', 'is_default' => true],
+                ['name' => 'SMP', 'is_default' => true],
+                ['name' => 'SES', 'is_default' => true],
+                ['name' => 'LLA', 'is_default' => true],
+            ]);
+        
     }
 }

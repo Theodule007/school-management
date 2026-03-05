@@ -11,7 +11,7 @@ class Enrollment extends Model
     protected $fillable = [
         'student_id',
         'academic_year_id',
-        'section_id',
+        'level_section_id',
         'status'
     ];
 
@@ -25,9 +25,9 @@ class Enrollment extends Model
         return $this->belongsTo(AcademicYear::class);
     }
 
-        public function section(): BelongsTo
+    public function levelSection(): BelongsTo
     {
-        return $this->belongsTo(Section::class);
+        return $this->belongsTo(LevelSection::class);
     }
 
     public function grades(): HasMany

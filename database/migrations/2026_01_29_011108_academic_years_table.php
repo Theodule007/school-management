@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sections', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignId('level_id')->constrained()->cascadeOnDelete();
-            $table->timestamps();
-        });
+    Schema::create('academic_years', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->date('start_date');
+    $table->date('end_date');
+    $table->enum('status', [ 'active', 'closed'])->default('closed');
+    $table->timestamps();
+});
+
     }
 
     /**
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sections');
+        Schema::dropIfExists('academic_years');
     }
 };

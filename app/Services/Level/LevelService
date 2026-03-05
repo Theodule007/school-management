@@ -1,0 +1,20 @@
+<?php
+namespace App\Services\Level;
+
+use App\Models\Level;
+use Exception;
+
+class LevelService
+{
+    public function create(array $data, array $sectionIds)
+    {
+        if ($data['cycle'] === 'fondamentale' && count($sectionIds) > 1) {
+            throw new Exception("Un niveau fondamental ne peut avoir qu'une section.");
+        }
+        $level = Level::create($data);
+
+        $level->sections()->sync($sectionIds);
+
+        return $level;
+    }
+}

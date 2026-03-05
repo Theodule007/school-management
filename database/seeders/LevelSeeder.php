@@ -13,8 +13,17 @@ class LevelSeeder extends Seeder
      */
     public function run(): void
     {
-        foreach (['1ère', '2ème', '3ème', '4ème'] as $level) {
-            Level::create(['name' => $level]);
-        }
+
+
+        Level::insert([
+            [
+                'name' => '7ème AF',
+                'cycle' => 'fondamentale',
+            ],
+            [
+                'name' => 'NS3',
+                'cycle' => 'secondaire',
+            ]
+        ]);
     }
 }

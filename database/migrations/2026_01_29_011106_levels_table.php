@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('academic_years', function (Blueprint $table) {
-    $table->id();
-    $table->string('name');
-    $table->date('start_date');
-    $table->date('end_date');
-    $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
-    $table->timestamps();
-});
-
+        Schema::create('levels', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->enum('cycle', ['fondamentale', 'secondaire']);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('academic_years');
+        Schema::dropIfExists('levels');
     }
 };

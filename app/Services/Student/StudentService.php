@@ -1,6 +1,9 @@
 <?php
 
+namespace App\Services\Student;
+
 use App\Models\Student;
+use DomainException;
 
 class StudentService
 {

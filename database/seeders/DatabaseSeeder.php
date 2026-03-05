@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Database\Seeders\LevelSectionSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,10 +22,15 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             AcademicYearSeeder::class,
-            LevelSeeder::class,
+
             SectionSeeder::class,
+            LevelSeeder::class,
             SubjectSeeder::class,
+            LevelSectionSeeder::class,
+            SubjectSectionSeeder::class,
+            StudentSeeder::class,
             PaymentTypeSeeder::class,
+
         ]);
 
         User::factory()->create([

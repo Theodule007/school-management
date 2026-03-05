@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('section_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('level_section_id')->constrained();            
             $table->enum('status', ['enrolled', 'transferred'])->default('enrolled');
             $table->timestamps();
 
