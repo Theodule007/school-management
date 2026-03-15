@@ -50,7 +50,8 @@ class SubjectController extends Controller
             'name' => 'required|string|max:255|unique:subjects,name',
             //'status' => 'required|in:active,inactive',
             'level_sections' => 'sometimes|array',
-            'level_sections.*.id' => 'required|exists:level_sections,id',
+            'level_sections.*.level_id' => 'required|exists:levels,id',
+            'level_sections.*.section_id' => 'required|exists:sections,id',
             'level_sections.*.coefficient' => 'required|numeric|min:0.5|max:10'
         ]);
 
@@ -63,9 +64,16 @@ class SubjectController extends Controller
             if (!empty($validated['level_sections'])) {
                 $pivotData = [];
                 foreach ($validated['level_sections'] as $ls) {
-                    $pivotData[$ls['id']] = ['coefficient' => $ls['coefficient']];
+                   // $pivotData[$ls['id']] = ['coefficient' => $ls['coefficient']];
+                    $levelSection = LevelSection::firstOrCreate([
+                    'level_id' => $ls['level_id'],
+                    'section_id' => $ls['section_id']
+                ]);
+                     $subject->levelSections()->attach($levelSection->id, [
+                    'coefficient' => $ls['coefficient']
+                ]);
                 }
-                $subject->levelSections()->sync($pivotData);
+               // $subject->levelSections()->sync($pivotData);
             }
         });
 

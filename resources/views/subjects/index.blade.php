@@ -109,16 +109,16 @@
                                     <span class="badge bg-info">{{ $subject->grades->count() }}</span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('subjects.show', $subject) }}" class="btn btn-sm btn-info">
+                                    <a href="{{ route('subjects.show', $subject) }}" class="btn btn-sm">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('subjects.edit', $subject) }}" class="btn btn-sm btn-warning">
+                                    <a href="{{ route('subjects.edit', $subject) }}" class="btn btn-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('subjects.destroy', $subject) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                        <button type="submit" class="btn btn-sm" 
                                                 onclick="return confirm('Supprimer cette matière ?')">
                                             <i class="fas fa-trash"></i>
                                         </button>

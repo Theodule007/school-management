@@ -53,16 +53,16 @@
                                 </td>
                                 <td>{{ $section->created_at->format('d/m/Y') }}</td>
                                 <td>
-                                    <a href="{{ route('sections.show', $section) }}" class="btn btn-sm btn-info" title="Voir">
+                                    <a href="{{ route('sections.show', $section) }}" class="btn btn-sm" title="Voir">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('sections.edit', $section) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                    <a href="{{ route('sections.edit', $section) }}" class="btn btn-sm" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('sections.destroy', $section) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer" 
+                                        <button type="submit" class="btn btn-sm" title="Supprimer" 
                                                 onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette section ? Toutes les inscriptions associées seront également supprimées.')">
                                             <i class="fas fa-trash"></i>
                                         </button>

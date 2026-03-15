@@ -1,0 +1,126 @@
+/* Typographie moderne */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Importer Inter depuis Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Coins arrondis pour les cartes */
+.card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons plus modernes */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 8px 16px;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Tableaux plus aérés */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Sidebar plus élégante */
+.main-sidebar {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+}
+
+.nav-sidebar .nav-link {
+    border-radius: 8px;
+    margin: 4px 12px;
+    transition: all 0.2s;
+}
+
+.nav-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+/* Badges plus stylés */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.badge-info {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%);
+    color: #fff;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+/* Navigation plus moderne */
+.main-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+/* Breadcrumb moderne */
+.breadcrumb {
+    background: transparent;
+    padding: 0.75rem 0;
+}
+
+.breadcrumb-item a {
+    color: #667eea;
+    font-weight: 500;
+}
+
+/* Animation des icônes */
+.nav-icon {
+    transition: transform 0.2s;
+}
+
+.nav-link:hover .nav-icon {
+    transform: scale(1.1);
+}
+
+/* Footer élégant */
+.main-footer {
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    padding: 1rem;
+}

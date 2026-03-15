@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use App\Services\Student\StudentService;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\DataTables;
 
 class StudentController extends Controller
 {
@@ -27,24 +29,31 @@ class StudentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+public function index(Request $request)
+{
+    if ($request->ajax()) {
         $query = Student::with(['guardians' => function ($q) {
-            $q->wherePivot('is_primary', true);
-        }])
+                $q->wherePivot('is_primary', true);
+            }])
             ->with('section');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('nisu', 'like', "%{$search}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", ["%{$search}%"]);
-            });
+        // Gestion de la recherche - compatible avec DataTables
+        if ($request->has('search')) {
+            $search = is_array($request->search) 
+                ? ($request->search['value'] ?? '') 
+                : $request->search;
+            
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('nisu', 'like', "%{$search}%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", ["%{$search}%"]);
+                });
+            }
         }
 
-        // FILTRE PAR NIVEAU - via les inscriptions
+        // Vos autres filtres
         if ($request->filled('level_id')) {
             $query->whereHas('enrollments', function ($q) use ($request) {
                 $q->whereHas('levelSection', function ($sq) use ($request) {
@@ -61,16 +70,117 @@ class StudentController extends Controller
             $query->where('status', $request->status);
         }
 
-        $students = $query->orderBy('last_name')
-            ->orderBy('first_name')
-            ->paginate(15)
-            ->withQueryString();
-
-        $levels = Level::orderBy('name')->get();
-        $sections = Section::orderBy('name')->get();
-
-        return view('students.index', compact('students', 'levels', 'sections'));
+        return DataTables::of($query)
+            ->addColumn('full_name', function ($student) {
+                return $student->first_name . ' ' . $student->last_name;
+            })
+            ->addColumn('gender_badge', function ($student) {
+                if ($student->gender == 'M') {
+                    return '<span class="badge bg-info">Masculin</span>';
+                }
+                return '<span class="badge bg-pink">Féminin</span>';
+            })
+            ->addColumn('birth_date_formatted', function ($student) {
+                return $student->birth_date ? $student->birth_date->format('d/m/Y') : 'Non renseignée';
+            })
+            ->addColumn('current_class', function ($student) {
+                if ($student->current_level) {
+                    $html = '<a href="' . route('levels.show', $student->current_level) . '">';
+                    $html .= $student->current_level->name . '</a>';
+                    if ($student->current_section) {
+                        $html .= ' <small class="text-muted">(' . $student->current_section->name . ')</small>';
+                    }
+                    return $html;
+                }
+                return '<span class="text-muted">Non inscrit</span>';
+            })
+            // ->addColumn('primary_guardian_name', function ($student) {
+            //     if ($student->primary_guardian) {
+            //         return $student->primary_guardian->first_name . ' ' . $student->primary_guardian->last_name;
+            //     }
+            //     return '<span class="text-muted">Aucun</span>';
+            // })
+            ->addColumn('status_badge', function ($student) {
+                if ($student->status == 'active') {
+                    return '<span class="badge bg-success">Actif</span>';
+                }
+                return '<span class="badge bg-secondary">Archivé</span>';
+            })
+            ->addColumn('action', function ($student) {
+                return '
+                    <a href="' . route('students.show', $student) . '" class="btn btn-sm" title="Voir">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="' . route('students.edit', $student) . '" class="btn btn-sm" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="' . route('students.destroy', $student) . '" method="POST" class="d-inline">
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="btn btn-sm" title="Archiver" 
+                                onclick="return confirm(\'Êtes-vous sûr de vouloir archiver cet étudiant ?\')">
+                            <i class="fas fa-archive"></i>
+                        </button>
+                    </form>
+                ';
+            })
+            ->addColumn('nisu_formatted', function ($student) {
+                return '<span class="badge bg-secondary">STU' . $student->nisu . '</span>';
+            })
+            ->rawColumns(['gender_badge', 'current_class', 'status_badge', 'action', 'nisu_formatted'])
+            ->make(true);
     }
+
+    // Pour l'affichage initial
+    $levels = Level::orderBy('name')->get();
+    $sections = Section::orderBy('name')->get();
+    
+    return view('students.index', compact('levels', 'sections'));
+}
+    // public function index(Request $request)
+    // {
+    //     $query = Student::with(['guardians' => function ($q) {
+    //         $q->wherePivot('is_primary', true);
+    //     }])
+    //         ->with('section');
+
+    //     if ($request->filled('search')) {
+    //         $search = $request->search;
+    //         $query->where(function ($q) use ($search) {
+    //             $q->where('first_name', 'like', "%{$search}%")
+    //                 ->orWhere('last_name', 'like', "%{$search}%")
+    //                 ->orWhere('nisu', 'like', "%{$search}%")
+    //                 ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", ["%{$search}%"]);
+    //         });
+    //     }
+
+    //     // FILTRE PAR NIVEAU - via les inscriptions
+    //     if ($request->filled('level_id')) {
+    //         $query->whereHas('enrollments', function ($q) use ($request) {
+    //             $q->whereHas('levelSection', function ($sq) use ($request) {
+    //                 $sq->where('level_id', $request->level_id);
+    //             });
+    //         });
+    //     }
+
+    //     if ($request->filled('section_id')) {
+    //         $query->where('section_id', $request->section_id);
+    //     }
+
+    //     if ($request->filled('status')) {
+    //         $query->where('status', $request->status);
+    //     }
+
+    //     $students = $query->orderBy('last_name')
+    //         ->orderBy('first_name')
+    //         ->paginate(15)
+    //         ->withQueryString();
+
+    //     $levels = Level::orderBy('name')->get();
+    //     $sections = Section::orderBy('name')->get();
+
+    //     return view('students.index', compact('students', 'levels', 'sections'));
+    // }
 
     /**
      * Show the form for creating a new resource.

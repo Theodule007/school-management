@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Grade extends Model
 {
-        protected $fillable = [
+    protected $fillable = [
         'enrollment_id',
         'subject_id',
         'period_id',
+        'teacher_id',
         'value',
         'is_locked'
     ];
@@ -28,5 +29,10 @@ class Grade extends Model
     public function period(): BelongsTo
     {
         return $this->belongsTo(Period::class);
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

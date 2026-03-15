@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     sectionsMap.forEach(section => {
-                        sectionSelect.innerHTML += `<option value="${section.levelSectionId}">${section.name}</option>`;
+                        sectionSelect.innerHTML += `<option value="${section.id}">${section.name}</option>`;
                     });
                 })
                 .catch(error => {

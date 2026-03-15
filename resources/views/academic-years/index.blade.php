@@ -50,16 +50,16 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('academic-years.show', $year) }}" class="btn btn-sm btn-info" title="Voir">
+                                    <a href="{{ route('academic-years.show', $year) }}" class="btn btn-sm" title="Voir">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('academic-years.edit', $year) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                    <a href="{{ route('academic-years.edit', $year) }}" class="btn btn-sm" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('academic-years.destroy', $year) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette année ?')">
+                                        <button type="submit" class="btn btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette année ?')">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>

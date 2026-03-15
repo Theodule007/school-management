@@ -8,57 +8,41 @@
     <li class="breadcrumb-item active">Étudiants</li>
 @endsection
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+@endpush
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Liste des étudiants</h3>
-                    
-                    <div class="card-tools">
-                        <div class="d-flex flex-wrap align-items-center gap-2" style="gap: 10px;">                            
-                            {{-- Formulaire de recherche --}}
-                            <form action="{{ route('students.index') }}" method="GET" class="form-inline">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h3 class="card-title">Liste des étudiants</h3>
+                        
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            {{-- Formulaire de filtres (pour DataTables) --}}
+                            <div class="form-inline">
                                 <div class="d-flex flex-wrap align-items-center" style="gap: 5px;">
-                                    {{-- Champ de recherche --}}
-                                    <div class="input-group input-group-sm" style="width: 200px;">
-                                        <input type="text" name="search" class="form-control" 
-                                            placeholder="Rechercher..." value="{{ request('search') }}">
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-default">
-                                                <i class="fas fa-search"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
                                     {{-- Filtre par niveau --}}
-                                    <select name="level_id" class="form-control form-control-sm" 
-                                            style="width: 130px;" onchange="this.form.submit()">
+                                    <select id="level-filter" class="form-control form-control-sm" style="width: 130px;">
                                         <option value="">Niveau</option>
                                         @foreach($levels ?? [] as $level)
-                                            <option value="{{ $level->id }}" {{ request('level_id') == $level->id ? 'selected' : '' }}>
-                                                {{ $level->name }}
-                                            </option>
+                                            <option value="{{ $level->id }}">{{ $level->name }}</option>
                                         @endforeach
                                     </select>
                                     
                                     {{-- Filtre par statut --}}
-                                    <select name="status" class="form-control form-control-sm" 
-                                            style="width: 100px;" onchange="this.form.submit()">
+                                    <select id="status-filter" class="form-control form-control-sm" style="width: 100px;">
                                         <option value="">Statut</option>
-                                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Actifs</option>
-                                        <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archivés</option>
+                                        <option value="active">Actifs</option>
+                                        <option value="archived">Archivés</option>
                                     </select>
-                                    
-                                    {{-- Bouton reset --}}
-                                    @if(request('search') || request('level') || request('status'))
-                                        <a href="{{ route('students.index') }}" class="btn btn-sm btn-secondary">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    @endif
                                 </div>
-                            </form>
+                            </div>
+                            
                             {{-- Bouton Nouvel étudiant --}}
                             <a href="{{ route('students.create') }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-plus"></i> Nouvel étudiant
@@ -66,102 +50,128 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body table-responsive p-0">
-                    <table class="table table-hover text-nowrap">
-                        <thead>
+                
+                <div class="card-body">
+                    <table class="table table-hover table-striped" id="students-table" style="width:100%">
+                        <thead class="bg-light">
                             <tr>
                                 <th>NISU</th>
-                                <th>Nom & Prénom</th>
+                                <th>Nom complet</th>
                                 <th>Genre</th>
                                 <th>Date naissance</th>
                                 <th>Classe actuelle</th>
-                                <th>Tuteur principal</th>
+                                {{-- <th>Tuteur principal</th> --}}
                                 <th>Statut</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($students as $student)
-                            <tr>
-                                <td>
-                                    <span class="badge bg-secondary">STU{{ $student->nisu }}</span>
-                                </td>
-                                <td>
-                                    <strong>{{ $student->full_name }}</strong><br>
-                                    <small class="text-muted">{{ $student->first_name }} {{ $student->last_name }}</small>
-                                </td>
-                                <td>
-                                    @if($student->gender == 'M')
-                                        <span class="badge bg-info">Masculin</span>
-                                    @else
-                                        <span class="badge bg-pink">Féminin</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    {{ $student->birth_date ? $student->birth_date->format('d/m/Y') : 'Non renseignée' }}
-                                </td>
-                                <td>
-                                    @if($student->current_level)
-                                        <a href="{{ route('levels.show', $student->current_level) }}">
-                                            {{ $student->current_level->name }}
-                                        </a>
-                                        <small class="text-muted">
-                                            ({{ $student->current_section->name ?? '' }})
-                                        </small>
-                                    @else
-                                        <span class="text-muted">Non inscrit</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($student->primary_guardian)
-                                        {{ $student->primary_guardian->first_name }} {{ $student->primary_guardian->last_name }}
-                                    @else
-                                        <span class="text-muted">Aucun</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($student->status == 'active')
-                                        <span class="badge bg-success">Actif</span>
-                                    @else
-                                        <span class="badge bg-secondary">Archivé</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-info" title="Voir">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('students.edit', $student) }}" class="btn btn-sm btn-warning" title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('students.destroy', $student) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Archiver" 
-                                                onclick="return confirm('Êtes-vous sûr de vouloir archiver cet étudiant ?')">
-                                            <i class="fas fa-archive"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="8" class="text-center py-4">
-                                    <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
-                                    <p>Aucun étudiant trouvé.</p>
-                                    <a href="{{ route('students.create') }}" class="btn btn-primary">
-                                        Ajouter le premier étudiant
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforelse
                         </tbody>
                     </table>
-                </div>
-                <div class="card-footer clearfix">
-                    {{ $students->links() }}
                 </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    var table = $('#students-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('students.index') }}",
+            data: function(d) {
+                d.level_id = $('#level-filter').val();
+                d.status = $('#status-filter').val();
+            }
+        },
+        columns: [
+            { data: 'nisu_formatted', name: 'nisu' },
+            { data: 'full_name', name: 'full_name' },
+            { data: 'gender_badge', name: 'gender' },
+            { data: 'birth_date_formatted', name: 'birth_date' },
+            { data: 'current_class', name: 'current_class', orderable: false },
+            // { data: 'primary_guardian_name', name: 'primary_guardian_name', orderable: false },
+            { data: 'status_badge', name: 'status' },
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ],
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json"
+        },
+        dom: "<'row'<'col-sm-12'><'col-sm-12'B>>" +
+            "<'row'<'col-sm-12'><'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        buttons: [
+            {
+                text: '<i class="fas fa-copy"></i> Copier',
+                extend: 'copy',
+                className: 'btn btn-sm btn-secondary'
+            },
+            {
+                text: '<i class="fas fa-file-csv"></i> CSV',
+                extend: 'csv',
+                className: 'btn btn-sm btn-success'
+            },
+            {
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                extend: 'excel',
+                className: 'btn btn-sm btn-success'
+            },
+            {
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                extend: 'pdf',
+                className: 'btn btn-sm btn-danger',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6]
+                }
+            },
+            {
+                text: '<i class="fas fa-print"></i> Imprimer',
+                extend: 'print',
+                className: 'btn btn-sm btn-info',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6]
+                }
+            },
+            {
+                text: '<i class="fas fa-eye"></i> Colonnes',
+                extend: 'colvis',
+                className: 'btn btn-sm btn-secondary'
+            }
+        ],
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Tous"]],
+        pageLength: 15,
+        order: [[1, 'asc']]
+    });
+
+    // Appliquer les filtres
+    $('#level-filter, #status-filter').on('change', function() {
+        table.ajax.reload();
+    });
+
+    // Réinitialiser les filtres
+    $('#reset-filters').on('click', function() {
+        $('#level-filter').val('');
+        $('#status-filter').val('');
+        table.ajax.reload();
+    });
+});
+</script>
+@endpush
